@@ -22,7 +22,7 @@ numerical validation of the analytical results.
 
 ```
 ├── delta_inversion.py   # Core numerics: Basic implementation of Mills ratio, normal CDF, Delta inversion
-├── paper_plots.py       # Unit tests and figures, reproducing paper results
+├── paper_plots.py       # Unit tests, demonstrating inversion of premium-adjusted delta
 └── README.md
 ```
 
