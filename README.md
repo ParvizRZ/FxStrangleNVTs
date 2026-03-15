@@ -1,7 +1,7 @@
 # Premium-Adjusted Forward Delta Inversion
 
 > Python implementation for the inversion of premium-adjusted forward delta, as described
-> in the accompanying paper.
+> in the paper "Analysis of volatility strangles via normalizing volatility transforms".
 
 ---
 
