@@ -118,6 +118,7 @@ If you use this code in your research, please cite:
 
 ---
 
-## License
+<!-- ## License
 
 [To be added]
+-->
