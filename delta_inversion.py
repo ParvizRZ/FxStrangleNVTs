@@ -112,7 +112,7 @@ def f2(z: float, total_vol: float) -> float:
     return z / total_vol + 0.5 * total_vol
 
 
-def bracket(y: float) -> tuple[float, float]:
+def bracket_old(y: float) -> tuple[float, float]:
     sqrt_half_pi = np.sqrt(0.5 * np.pi)
     xx = 1.0 / y
     if 0 < y <= sqrt_half_pi:
@@ -123,6 +123,19 @@ def bracket(y: float) -> tuple[float, float]:
             return (0.0, xx)
     elif y >= sqrt_half_pi:
         return (sqrt_half_pi - y, 0.0)
+    else:
+        raise NotImplementedError
+
+def bracket_new(y: float) -> tuple[float, float]:
+    sqrt_half_pi = np.sqrt(0.5 * np.pi)
+    two_over_pi = 2.0 / np.pi
+    if 0 < y <= sqrt_half_pi:
+        ll = 1.0 / y * (np.pi - 2.0 * y ** 2) / (np.pi - 1.0 + np.sqrt(1 + 2.0 * (np.pi - 2.0) * y ** 2))
+        rr = 1.0 / y - 2.0 * y / np.pi
+        return (ll, rr)
+    elif y >= sqrt_half_pi:
+        return (-np.sqrt(2.0 * np.log(y / np.sqrt(2.0 * np.pi) + 0.5)),
+                         np.sqrt(two_over_pi) - np.sqrt(two_over_pi + 2.0 * np.log(np.sqrt(two_over_pi) * y)))
     else:
         raise NotImplementedError
 
@@ -175,7 +188,7 @@ def R_inv(y0: float):
     """Calculates solution x0 of the equation x0=R^{-1}(y0), where R is Mills ratio using bisection"""
     if y0 <= 0.0 or not np.isfinite(y0):
         raise ValueError(f"y0 must be positive and finite, y0 = {y0}")
-    lb, ub = bracket(y0)
+    lb, ub = bracket_new(y0)
     x0 = bisect(R, y0, lb, ub, is_bounds_to_nan=False)
     return x0
 
