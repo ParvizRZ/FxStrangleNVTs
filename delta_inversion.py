@@ -7,7 +7,6 @@ class OptionType(Enum):
     PUT = 'PUT'
 
 
-tol = 1e-8
 sqrt_2pi = 2.50662827463
 
 
@@ -53,6 +52,10 @@ def norm_cdf(x: float) -> float:
         return norm_cdf_poly(abs(x)) * np.exp(-0.5 * x ** 2)
     else:
         return 1.0 - norm_cdf_poly(abs(x)) * np.exp(-0.5 * x ** 2)
+
+
+def norm_pdf(x: float) -> float:
+    return 1.0 / sqrt_2pi * np.exp(-0.5 * x ** 2)
 
 
 def inv_normal_cdf(p: float):
@@ -112,20 +115,6 @@ def f2(z: float, total_vol: float) -> float:
     return z / total_vol + 0.5 * total_vol
 
 
-def bracket_old(y: float) -> tuple[float, float]:
-    sqrt_half_pi = np.sqrt(0.5 * np.pi)
-    xx = 1.0 / y
-    if 0 < y <= sqrt_half_pi:
-        if 0 < y <= 0.5:
-            x2 = 0.5 * (1 + np.sqrt(1 - 4 * y * y)) / y
-            return (x2, xx)
-        else:  # y > 0.5:
-            return (0.0, xx)
-    elif y >= sqrt_half_pi:
-        return (sqrt_half_pi - y, 0.0)
-    else:
-        raise NotImplementedError
-
 def bracket_new(y: float) -> tuple[float, float]:
     sqrt_half_pi = np.sqrt(0.5 * np.pi)
     two_over_pi = 2.0 / np.pi
@@ -135,13 +124,13 @@ def bracket_new(y: float) -> tuple[float, float]:
         return (ll, rr)
     elif y >= sqrt_half_pi:
         return (-np.sqrt(2.0 * np.log(y / np.sqrt(2.0 * np.pi) + 0.5)),
-                         np.sqrt(two_over_pi) - np.sqrt(two_over_pi + 2.0 * np.log(np.sqrt(two_over_pi) * y)))
+                np.sqrt(two_over_pi) - np.sqrt(two_over_pi + 2.0 * np.log(np.sqrt(two_over_pi) * y)))
     else:
         raise NotImplementedError
 
 
 def bisect(func, y0: float, a: float, b: float,
-           tol: float = tol, is_bounds_to_nan: bool = True) -> float:
+           tol: float = 1e-8, is_bounds_to_nan: bool = True) -> float:
     """
     find root of f(x)=y0 over x\in[a,b] via bisection
     """
@@ -162,7 +151,7 @@ def bisect(func, y0: float, a: float, b: float,
             rtb = b
             dx = a - b
         xmid = rtb
-        for j in range(0, 40):
+        for j in range(0, 60):
             dx = dx * 0.5
             xmid = rtb + dx
             fmid = func(xmid) - y0
@@ -198,23 +187,29 @@ def delta_prem_adj(total_vol: float, z, opt_type: OptionType) -> float:
     delta_fwd = w * np.exp(z) * norm_cdf(-w * f2(z, total_vol))
     return delta_fwd
 
-def z_prem_adj(total_vol: float, delta_fwd: float, opt_type: OptionType) -> float:
+
+def z_prem_adj(total_vol: float, delta_fwd: float, opt_type: OptionType, tol: float = 1e-8,
+               is_right_root: bool = True) -> float:
     """resolves log-moneyness z for premium-adjusted forward delta"""
     w = 1 if opt_type == OptionType.CALL else -1
     assert 0.0 < delta_fwd * w < 1.0
-    fo = R_inv(1.0 / total_vol)
     z_R = -w * total_vol * inv_normal_cdf(w * delta_fwd) + 0.5 * total_vol ** 2
     if opt_type == OptionType.PUT:
         z_L = np.log(np.fabs(delta_fwd))
     else:
+        fo = R_inv(1.0 / total_vol)
         z_L = total_vol * (fo - 0.5 * total_vol)
         delta_max = np.exp(z_L) * norm_cdf(-f2(z_L, total_vol))
         if delta_fwd >= delta_max:
             return np.nan
 
+    if not is_right_root and opt_type == OptionType.CALL:
+        z_R = z_L
+        z_L = np.minimum(-5.0, z_R - 0.5)
+
     # premium adjusted delta
     func = lambda z: delta_prem_adj(total_vol, z, opt_type)
-    z_sol = bisect(func, delta_fwd, z_L, z_R)
+    z_sol = bisect(func, delta_fwd, z_L, z_R, is_bounds_to_nan=False, tol=tol)
 
     err = np.fabs(func(z_sol) - delta_fwd)
     # print(f"vol={sigma}, error={err}")
@@ -222,3 +217,16 @@ def z_prem_adj(total_vol: float, delta_fwd: float, opt_type: OptionType) -> floa
     return z_sol
 
 
+def W_deriv(total_vol: float, delta_fwd: float, is_right_root: bool = True) -> float:
+    z_call = z_prem_adj(total_vol, delta_fwd, OptionType.CALL, 1e-8, is_right_root)
+    z_put = z_prem_adj(total_vol, -delta_fwd, OptionType.PUT, 1e-8, is_right_root)
+    f2_call = f2(z_call, total_vol)
+    f2_put = f2(z_put, total_vol)
+    if np.isnan(f2_call) or np.isnan(f2_put):
+        return np.nan
+    R_call = R(f2_call)
+    R_put = R(-f2_put)
+
+    deriv = (norm_pdf(-f2_call + total_vol) * (1.0 - f2_call * R_call) / (1.0 - total_vol * R_call) +
+             norm_pdf(f2_put - total_vol) * (f2_put * R_put + 1.0) / (1.0 + total_vol * R_put))
+    return deriv
