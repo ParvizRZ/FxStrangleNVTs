@@ -92,7 +92,7 @@ tolerance, and the RMSE against a $10^{-12}$ benchmark is returned.
 ### `test_delta_max_neighbourhood`
 Reproduction of Table 2. A convenience wrapper that calls `test_delta_max` at three 
 tolerance levels ($10^{-6}$, $10^{-8}$, $10^{-9}$) and collects the RMSE results into 
-a summary table, providing a targeted assessment of near-$\Delta_{max}$ accuracy.
+a summary table, providing a targeted assessment of near- $\Delta_{max}$ accuracy.
 
 ### `plot_prem_adj_delta`
 Produces a two-panel figure assuming total volatility $\overline\sigma = \sigma\sqrt{T}$ with
@@ -106,6 +106,16 @@ $\sigma = 0.15$ and $T = 2$ years:
 
 ![Premium-adjusted forward delta](figures/prem_adj_delta.png)
 
+### `plot_W_deriv`
+Produces a two-panel figure assuming $T = 6$ and $\Delta=0.25$ years:
+- **Left panel**: Sensitivity of strangle premium $V_{\sigma_{\matrm{str}}}$ as a function of
+  stangle volatility \sigma_{\matrm{str}}, when we chose a smaller root $z_a$ in delta-to-strike
+  conversion
+- **Right panel**: Sensitivity of strangle premium $V_{\sigma_{\matrm{str}}}$ as a function of
+  stangle volatility \sigma_{\matrm{str}}, when we chose a smaller root $z_a$ in delta-to-strike
+  conversion
+
+![Premium-adjusted forward delta](figures/prem_adj_delta.png)
 ---
 
 ## Installation
