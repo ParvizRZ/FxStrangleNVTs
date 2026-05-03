@@ -152,10 +152,10 @@ def plot_W_deriv(delta_fwd: float):
     vols = np.linspace(0.25, 0.5, 101)
     T = 6
     total_vols = vols * np.sqrt(T)
-    W_r_derivs = np.array([W_deriv(total_vol, delta_fwd, False) for total_vol in total_vols])
-    W_l_derivs = np.array([W_deriv(total_vol, delta_fwd, True) for total_vol in total_vols])
-    axs[0].plot(vols, W_r_derivs)
-    axs[1].plot(vols, W_l_derivs)
+    W_l_derivs = np.array([W_deriv(total_vol, delta_fwd, False) for total_vol in total_vols])
+    W_r_derivs = np.array([W_deriv(total_vol, delta_fwd, True) for total_vol in total_vols])
+    axs[0].plot(vols, W_l_derivs)
+    axs[1].plot(vols, W_r_derivs)
 
     axs[0].set_xlabel(f"$\\sigma_{{\mathrm{{str}}}}$")
     # axs[0].set_ylabel(f"$\\Delta^{{pa,F}}$")
