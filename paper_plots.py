@@ -143,7 +143,7 @@ def plot_prem_adj_delta():
                      fontsize=10, color="darkblue")
 
     plt.show()
-    fig.savefig("figures/prem_adj_delta.png", dpi=150, bbox_inches='tight')
+    # fig.savefig("figures/prem_adj_delta.png", dpi=150, bbox_inches='tight')
 
 
 
@@ -152,8 +152,8 @@ def plot_W_deriv(delta_fwd: float):
     vols = np.linspace(0.25, 0.5, 101)
     T = 6
     total_vols = vols * np.sqrt(T)
-    W_r_derivs = np.array([W_deriv(total_vol, delta_fwd, True) for total_vol in total_vols])
-    W_l_derivs = np.array([W_deriv(total_vol, delta_fwd, False) for total_vol in total_vols])
+    W_r_derivs = np.array([W_deriv(total_vol, delta_fwd, False) for total_vol in total_vols])
+    W_l_derivs = np.array([W_deriv(total_vol, delta_fwd, True) for total_vol in total_vols])
     axs[0].plot(vols, W_r_derivs)
     axs[1].plot(vols, W_l_derivs)
 
@@ -166,11 +166,11 @@ def plot_W_deriv(delta_fwd: float):
     axs[0].set_xlabel(f"$\sigma_{{\mathrm{{str}}}}$")
     # axs[1].set_ylabel(f"$z$")
     axs[1].set_title(f"Derivative $W'(\sigma_{{\mathrm{{str}}}})$ as a function of $\sigma_{{\mathrm{{str}}}}$,\n"
-                     f"assuming larger call root $z_b$",
+                     f"assuming larger  call root $z_b$",
                      fontsize=10, color="darkblue")
 
     plt.show()
-    fig.savefig("figures/strangle_vega.png", dpi=150, bbox_inches='tight')
+    # fig.savefig("figures/strangle_vega.png", dpi=150, bbox_inches='tight')
 
 
 if __name__ == '__main__':
