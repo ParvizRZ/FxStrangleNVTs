@@ -107,12 +107,12 @@ $\sigma = 0.15$ and $T = 2$ years:
 ![Premium-adjusted forward delta](figures/prem_adj_delta.png)
 
 ### `plot_W_deriv`
-Produces a two-panel figure assuming $T = 6$ and $\Delta=0.25$ years:
-- **Left panel**: Sensitivity of strangle premium $V_{\sigma_{\matrm{str}}}$ as a function of
-  stangle volatility $\sigma_{\matrm{str}}$, when we chose a smaller root $z_a$ in delta-to-strike
+Produces a two-panel figure assuming $T = 6$ years and $\Delta=0.25$ :
+- **Left panel**: Sensitivity of strangle premium $V_{\sigma_{\mathrm{str}}}$ as a function of
+  stangle volatility $\sigma_{\mathrm{str}}$, when we chose a smaller root $z_a$ in delta-to-strike
   conversion
-- **Right panel**: Sensitivity of strangle premium $V_{\sigma_{\matrm{str}}}$ as a function of
-  stangle volatility $\sigma_{\matrm{str}}$, when we chose a larget root $z_b$ in delta-to-strike
+- **Right panel**: Sensitivity of strangle premium $V_{\sigma_{\mathrm{str}}}$ as a function of
+  stangle volatility $\sigma_{\mathrm{str}}$, when we chose a larget root $z_b$ in delta-to-strike
   conversion
 
 ![Premium-adjusted forward delta](figures/strangle_vega.png)
